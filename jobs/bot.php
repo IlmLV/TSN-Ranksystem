@@ -63,7 +63,10 @@ function log_mysql($jobname,$mysqlcon,$timezone) {
 	}
 }
 
-function check_shutdown($timezone,$logpath) {
+function check_shutdown($timezone,$logpath=false) {
+	if($logpath === false)
+		global $logpath;
+
 	if(!is_file(substr(__DIR__,0,-4).'logs/pid')) {
 		enter_logfile($logpath,$timezone,5,"Received signal to stop. Shutting down!\n\n");
 		exit;

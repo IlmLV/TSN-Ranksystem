@@ -4,6 +4,7 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$jobid,$timezone,$show
 	$nowtime = time();
 	$sqlmsg = '';
 	$sqlerr = 0;
+	$uidarr = array();
 
 	if ($update == 1) {
 		$updatetime = $nowtime - $updateinfotime;

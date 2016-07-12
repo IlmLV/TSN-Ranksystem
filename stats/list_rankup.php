@@ -14,6 +14,7 @@ if(isset($_POST['username'])) {
 	$_GET["search"] = strip_tags(htmlspecialchars($_POST['usersuche']));
 	$_GET["seite"] = 1;
 }
+$getstring='';
 $filter='';
 $searchstring='';
 if(isset($_GET["search"]) && $_GET["search"] != '') {
@@ -241,14 +242,14 @@ if($adminlogin == 1) {
 				if ($showcolsg == 1 || $adminlogin == 1)
 					echo '<th class="text-center"><a href="?sort=nextsgrp&amp;order=' , $keyorder2 , '&amp;seite=' , $seite , '&amp;user=' , $user_pro_seite , '&amp;search=' , $getstring , '"><span class="hdcolor">' , $lang['listnxsg'] , '</span></a></th>';
 				echo '</tr></thead><tbody>';
+				$exceptgrp=0;
+				$exceptcld=0;
+				$countallsum=0;
 				ksort($grouptime);
 				$countgrp = count($grouptime);
 				if ($countentries > 0) {
 					$countrank=($seite-1)*$user_pro_seite;
-					$exceptgrp=0;
-					$exceptcld=0;
 					$highest=0;
-					$countallsum=0;
 					foreach ($uidarr as $uid) {
 						$cldgroup = $sqlhis[$uid]['cldgroup'];
 						$lastseen = $sqlhis[$uid]['lastseen'];
@@ -362,10 +363,14 @@ if($adminlogin == 1) {
 									if ($grpcount == $countgrp && $nextup == 0 && $showhighest == 1 || $grpcount == $countgrp && $nextup == 0 && $adminlogin == 1) {
 										echo '<td class="text-center">',$lang['highest'],'</td>';
 										$highest++;
-									} elseif ($sqlhisgroup_file[$groupid]===true) {
-										echo '<td class="text-center"><img src="../icons/'.$groupid.'.png" alt="groupicon">&nbsp;&nbsp;' , $sqlhisgroup[$groupid] , '</td>';
+									} elseif(!empty($sqlhisgroup_file[$groupid])) {
+										if ($sqlhisgroup_file[$groupid] === true) {
+											echo '<td class="text-center"><img src="../icons/' . $groupid . '.png" alt="groupicon">&nbsp;&nbsp;', $sqlhisgroup[$groupid], '</td>';
+										} else {
+											echo '<td class="text-center">', $sqlhisgroup[$groupid], '</td>';
+										}
 									} else {
-										echo '<td class="text-center">' , $sqlhisgroup[$groupid] , '</td>';
+										echo '<td class="text-center"></td>';
 									}
 								}
 								echo '</tr>';

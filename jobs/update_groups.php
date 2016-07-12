@@ -15,9 +15,11 @@ function update_groups($ts3,$mysqlcon,$lang,$dbname,$slowmode,$jobid,$timezone,$
 		}
 	}
 
-	foreach($iconlist as $icon) {
-		$iconid = "i".substr($icon['name'], 5);
-		$iconarr[$iconid] = $icon['datetime'];
+	if(is_array($iconlist)){
+		foreach($iconlist as $icon) {
+			$iconid = "i".substr($icon['name'], 5);
+			$iconarr[$iconid] = $icon['datetime'];
+		}
 	}
 	
 	try {
