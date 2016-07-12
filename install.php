@@ -70,7 +70,7 @@ if(isset($_POST['confweb'])) {
 				$sqlconerr = 'SQL Connection failed: '.$e->getMessage();
 			}
 		}
-		if(empty($host) || empty($user) || empty($pass) || empty($dbname) || isset($sqlconerr))	{
+		if(empty($host) || empty($user) || empty($dbname) || isset($sqlconerr))	{
 			echo '<form name="form" method="post">
 			<table class="tabledefault">
 			<tr><td class="right" colspan="2">Language: <select name="lang" onchange="location.href=this.form.lang.options[this.form.lang.selectedIndex].value"><option>&nbsp;</option><option value="install.php?lang=en">english</option><option value="install.php?lang=de">deutsch</option><option value="install.php?lang=ru">русский</option></select></td></tr>
