@@ -92,6 +92,7 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$jobid,$timezone,$show
 	$sumentries = 0;
 	$nextupforinsert = key($grouptime) - 1;
 
+	// Loop every online client from team speak server
 	foreach ($allclients as $client) {
 		$sumentries++;
 		$cldbid   = $client['client_database_id'];
@@ -112,6 +113,8 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$jobid,$timezone,$show
 			} else {
 				$except = 0;
 			}
+
+			// Check if client exists in rank database
 			if (in_array($uid, $uidarr)) {
 				$idle   = $sqlhis[$uid]['idle'] + $clientidle;
 				$grpid  = $sqlhis[$uid]['grpid'];
@@ -165,63 +168,89 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$jobid,$timezone,$show
 					$activetime = $count;
 				}
 				$dtT = new DateTime("@$activetime");
+
+				$grpid = 0;
+				$grpidTime = 0;
 				foreach ($grouptime as $time => $groupid) {
 					if (in_array($groupid, $sgroups)) {
 						$grpid = $groupid;
+						$grpidTime = $time;
 						break;
 					}
 				}
+
+				// Remove all unnecessary server groups (lower ranked than client top rank)
+				foreach ($grouptime as $time => $groupid) {
+					if ($grpid != $groupid && $time < $grpidTime && $groupid != 0 && in_array($groupid, $sgroups)) {
+						check_shutdown($timezone); usleep($slowmode);
+						try {
+							$ts3->serverGroupClientDel($groupid, $cldbid);
+							enter_logfile($logpath, $timezone, 5, sprintf($lang['sgrprm'], $groupid, $name, $uid, $cldbid));
+						} catch (Exception $e) {
+							enter_logfile($logpath, $timezone, 2, "calc_user 9:" . sprintf($lang['sgrprerr'], $name, $uid, $cldbid));
+							$sqlmsg .= $e->getCode() . ': ' . $e->getMessage();
+							$sqlerr++;
+						}
+					}
+				}
+
+				// Add new client server groups
 				$grpcount=0;
 				foreach ($grouptime as $time => $groupid) {
 					$grpcount++;
 					if ($activetime > $time && !in_array($uid, $exceptuuid) && !array_intersect($sgroups, $exceptgroup)) {
-						if ($sqlhis[$uid]['grpid'] != $groupid) {
-							if ($sqlhis[$uid]['grpid'] != 0 && in_array($sqlhis[$uid]['grpid'], $sgroups)) {
-								check_shutdown($timezone); usleep($slowmode);
-								try {
-									$ts3->serverGroupClientDel($sqlhis[$uid]['grpid'], $cldbid);
-									enter_logfile($logpath,$timezone,5,sprintf($lang['sgrprm'], $sqlhis[$uid]['grpid'], $name, $uid, $cldbid));
-								}
-								catch (Exception $e) {
-									enter_logfile($logpath,$timezone,2,"calc_user 9:".sprintf($lang['sgrprerr'], $name, $uid, $cldbid));
-									$sqlmsg .= $e->getCode() . ': ' . $e->getMessage();
-									$sqlerr++;
-								}
-							}
-							if (!in_array($groupid, $sgroups)) {
-								check_shutdown($timezone); usleep($slowmode);
-								try {
-									$ts3->serverGroupClientAdd($groupid, $cldbid);
-									enter_logfile($logpath,$timezone,5,sprintf($lang['sgrpadd'], $groupid, $name, $uid, $cldbid));
-								}
-								catch (Exception $e) {
-									enter_logfile($logpath,$timezone,2,"calc_user 10:".sprintf($lang['sgrprerr'], $name, $uid, $cldbid));
-									$sqlmsg .= $e->getCode() . ': ' . $e->getMessage();
-									$sqlerr++;
-								}
-							}
-							$grpid = $groupid;
-							if ($msgtouser == 1) {
-								check_shutdown($timezone); usleep($slowmode);
-								$days  = $dtF->diff($dtT)->format('%a');
-								$hours = $dtF->diff($dtT)->format('%h');
-								$mins  = $dtF->diff($dtT)->format('%i');
-								$secs  = $dtF->diff($dtT)->format('%s');
-								if ($substridle == 1) {
+						if ($grpid != $groupid) {
+							// Add new group if rank time is greater than client current top rank time
+							if($time > $grpidTime) {
+								// Before add new client group remove previous
+								if ($sqlhis[$uid]['grpid'] != 0 && in_array($grpid, $sgroups)) {
+									check_shutdown($timezone); usleep($slowmode);
 									try {
-										$ts3->clientGetByUid($uid)->message(sprintf($lang['usermsgactive'], $days, $hours, $mins, $secs));
-									} catch (Exception $e) {
-										enter_logfile($logpath,$timezone,2,"calc_user 11:".sprintf($lang['sgrprerr'], $name, $uid, $cldbid));
+										$ts3->serverGroupClientDel($sqlhis[$uid]['grpid'], $cldbid);
+										enter_logfile($logpath,$timezone,5,sprintf($lang['sgrprm'], $sqlhis[$uid]['grpid'], $name, $uid, $cldbid));
+									}
+									catch (Exception $e) {
+										enter_logfile($logpath,$timezone,2,"calc_user 9:".sprintf($lang['sgrprerr'], $name, $uid, $cldbid));
 										$sqlmsg .= $e->getCode() . ': ' . $e->getMessage();
 										$sqlerr++;
 									}
-								} else {
+								}
+								if (!in_array($groupid, $sgroups)) {
+									check_shutdown($timezone); usleep($slowmode);
 									try {
-										$ts3->clientGetByUid($uid)->message(sprintf($lang['usermsgonline'], $days, $hours, $mins, $secs));
-									} catch (Exception $e) {
-										enter_logfile($logpath,$timezone,2,"calc_user 12:".sprintf($lang['sgrprerr'], $name, $uid, $cldbid));
+										// Add new client server group
+										$ts3->serverGroupClientAdd($groupid, $cldbid);
+										enter_logfile($logpath,$timezone,5,sprintf($lang['sgrpadd'], $groupid, $name, $uid, $cldbid));
+									}
+									catch (Exception $e) {
+										enter_logfile($logpath,$timezone,2,"calc_user 10:".sprintf($lang['sgrprerr'], $name, $uid, $cldbid));
 										$sqlmsg .= $e->getCode() . ': ' . $e->getMessage();
 										$sqlerr++;
+									}
+								}
+								$grpid = $groupid;
+								if ($msgtouser == 1) {
+									check_shutdown($timezone); usleep($slowmode);
+									$days  = $dtF->diff($dtT)->format('%a');
+									$hours = $dtF->diff($dtT)->format('%h');
+									$mins  = $dtF->diff($dtT)->format('%i');
+									$secs  = $dtF->diff($dtT)->format('%s');
+									if ($substridle == 1) {
+										try {
+											$ts3->clientGetByUid($uid)->message(sprintf($lang['usermsgactive'], $days, $hours, $mins, $secs));
+										} catch (Exception $e) {
+											enter_logfile($logpath,$timezone,2,"calc_user 11:".sprintf($lang['sgrprerr'], $name, $uid, $cldbid));
+											$sqlmsg .= $e->getCode() . ': ' . $e->getMessage();
+											$sqlerr++;
+										}
+									} else {
+										try {
+											$ts3->clientGetByUid($uid)->message(sprintf($lang['usermsgonline'], $days, $hours, $mins, $secs));
+										} catch (Exception $e) {
+											enter_logfile($logpath,$timezone,2,"calc_user 12:".sprintf($lang['sgrprerr'], $name, $uid, $cldbid));
+											$sqlmsg .= $e->getCode() . ': ' . $e->getMessage();
+											$sqlerr++;
+										}
 									}
 								}
 							}
