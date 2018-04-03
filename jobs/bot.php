@@ -84,18 +84,12 @@ require_once(substr(__DIR__,0,-4).'jobs/calc_userstats.php');
 require_once(substr(__DIR__,0,-4).'jobs/clean.php');
 require_once(substr(__DIR__,0,-4).'jobs/check_db.php');
 require_once(substr(__DIR__,0,-4).'jobs/handle_messages.php');
-require_once(substr(__DIR__,0,-4).'jobs/update_rs.php');
 
 enter_logfile($logpath,$timezone,6,"Running on OS: ".php_uname("s")." ".php_uname("r"));
 enter_logfile($logpath,$timezone,6,"Using PHP Version: ".phpversion());
 enter_logfile($logpath,$timezone,6,"Database Version: ".$mysqlcon->getAttribute(PDO::ATTR_SERVER_VERSION));
 
 $currvers = check_db($mysqlcon,$lang,$dbname,$timezone,$currvers,$logpath);
-enter_logfile($logpath,$timezone,5,"Check Ranksystem files for updates...");
-if(isset($currvers) && isset($newversion) && $newversion != NULL && version_compare($newversion, $currvers, '>')) {
-	update_rs($mysqlcon,$lang,$dbname,$logpath,$timezone,$newversion,$phpcommand);
-}
-enter_logfile($logpath,$timezone,5,"Check Ranksystem files for updates [done]");
 
 function check_shutdown($timezone,$logpath) {
 	if(!is_file(substr(__DIR__,0,-4).'logs/pid')) {
