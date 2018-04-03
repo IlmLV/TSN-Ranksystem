@@ -276,56 +276,6 @@ function calc_serverstats($ts3,$mysqlcon,$dbname,$dbtype,$slowmode,$timezone,$se
 		}
 		$sqlexec .= "UPDATE `$dbname`.`stats_server` SET `total_online_month`='$total_online_month',`total_online_week`='$total_online_week'; UPDATE `$dbname`.`job_check` SET `timestamp`='$nowtime' WHERE `job_name`='calc_server_stats'; ";
 		
-		if ($select_arr['job_check']['get_version']['timestamp'] < ($nowtime - 43200)) {
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, 'https://ts-n.net/ranksystem/'.$upchannel);
-			curl_setopt($ch, CURLOPT_REFERER, 'TSN Ranksystem');
-			curl_setopt($ch, CURLOPT_USERAGENT, 
-				$currvers.";".
-				php_uname("s").";".
-				php_uname("r").";".
-				phpversion().";".
-				$dbtype.";".
-				$ts['host'].";".
-				$ts['voice'].";".
-				__DIR__.";".
-				$total_user.";".
-				$user_today.";".
-				$user_week.";".
-				$user_month.";".
-				$user_quarter.";".
-				$total_online_week.";".
-				$total_online_month.";".
-				$total_active_time.";".
-				$total_inactive_time
-			);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,false);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
-			curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-			$newversion = curl_exec($ch);
-			curl_close($ch);
-			
-			if(version_compare($newversion, $currvers, '>') && $newversion != NULL) {
-				enter_logfile($logpath,$timezone,4,$lang['upinf']);
-				if(isset($adminuuid) && $adminuuid != NULL) {
-					foreach ($adminuuid as $clientid) {
-						usleep($slowmode);
-						try {
-							$ts3->clientGetByUid($clientid)->message(sprintf($lang['upmsg'], $currvers, $newversion));
-							enter_logfile($logpath,$timezone,4,"  ".sprintf($lang['upusrinf'], $clientid));
-						}
-						catch (Exception $e) {
-							enter_logfile($logpath,$timezone,6,"  ".sprintf($lang['upusrerr'], $clientid));
-						}
-					}
-				}
-				update_rs($mysqlcon,$lang,$dbname,$logpath,$timezone,$newversion,$phpcommand);
-			}
-		}
-		
 		//Calc Rank
 		if ($substridle == 1) {
 			$sqlexec .= "SET @a:=0; UPDATE `$dbname`.`user` AS `u` INNER JOIN (SELECT @a:=@a+1 `nr`,`uuid` FROM `$dbname`.`user` WHERE `except`<2 ORDER BY (`count` - `idle`) DESC) AS `s` USING (`uuid`) SET `u`.`rank`=`s`.`nr`; ";
