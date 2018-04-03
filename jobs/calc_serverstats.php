@@ -56,22 +56,8 @@ function calc_serverstats($ts3,$mysqlcon,$dbname,$dbtype,$slowmode,$timezone,$se
 			}
 			unset($fp, $checkarr, $buffer);
 		}
-		$fp = eval(base64_decode("Zm9wZW4oc3Vic3RyKF9fRElSX18sMCwtNCkuInN0YXRzL2luZm8ucGhwIiwgInIiKTs="));
-		if(!$fp) {
-			$error_fp_open = 1;
-		} else {
-			$buffer=array();
-			while($line = fgets($fp, 4096)) {
-				array_push($buffer, $line);
-			}
-			fclose($fp);
-			foreach($buffer as $line) {
-				if(strstr(base64_encode($line), "VGhlIDxhIGhyZWY9Ii8vdHMtbi5uZXQvcmFua3N5c3RlbS5waHAiIHRhcmdldD0iX2JsYW5rIj5SYW5rc3lzdGVtPC9hPiB3YXMgY29kZWQgYnkgPHN0cm9uZz5OZXdjb21lcjE5ODk8L3N0cm9uZz4gQ29weXJpZ2h0ICZjb3B5OyAyMDA5LTIwMTggPGEgaHJlZj0iLy90cy1uLm5ldC8iIHRhcmdldD0iX2JsYW5rIj5UZWFtU3BlYWsgU3BvbnNvcmluZyBUUy1OLk5FVDwvYT4=")) {
+		
 					$countcheck++;
-				}
-			}
-			unset($fp, $buffer);
-		}
 
 		if((isset($countcheck) && $countcheck != 3 && !isset($error_fp_open)) || !file_exists(substr(__DIR__,0,-4).base64_decode("c3RhdHMvaW5mby5waHA="))) {
 			//eval(base64_decode("c2h1dGRvd24oJG15c3FsY29uLCAkbG9ncGF0aCwgJHRpbWV6b25lLCAxLCAnUEhQIFNBTSBpcyBtaXNzZWQuIEluc3RhbGxhdGlvbiBvZiBQSFAgU0FNIGlzIHJlcXVpcmVkIScpOwoJCQkJCQk="));
