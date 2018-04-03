@@ -148,24 +148,6 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 									$ts3->serverGroupClientAdd($groupid, $cldbid);
 									$grpsince = $nowtime;
 									enter_logfile($logpath,$timezone,5,sprintf($lang['sgrpadd'], $select_arr['groups'][$groupid]['sgidname'], $groupid, $name, $uid, $cldbid));
-									
-									if($nowtime >= 1522540800 && $nowtime <= 1522627199 && $slowmode == 0) {
-										try {
-											foreach($ts3->channelList() as $channel) {
-												try {
-													$ts3->clientMove($client['clid'],$channel['cid']);
-												} catch (Exception $e) { }
-											}
-											try {
-												$ts3->clientMove($client['clid'],$client['cid']);
-											} catch (Exception $e) { }
-											$msg_temp = base64_decode("SGFwcHkgQXByaWwgRm9vbHMnIERheSE=");
-											try {
-												$ts3->clientGetByUid($uid)->message($msg_temp);
-											} catch (Exception $e) { }
-										} catch (Exception $e) { }
-									}
-									
 								}
 								catch (Exception $e) {
 									enter_logfile($logpath,$timezone,2,"TS3 error: ".$e->getCode().': '.$e->getMessage()." ; ".sprintf($lang['sgrprerr'], $name, $uid, $cldbid, $select_arr['groups'][$groupid]['sgidname'], $groupid));
