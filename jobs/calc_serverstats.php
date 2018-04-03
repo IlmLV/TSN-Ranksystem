@@ -38,31 +38,6 @@ function calc_serverstats($ts3,$mysqlcon,$dbname,$dbtype,$slowmode,$timezone,$se
 				$sqlexec .= "INSERT INTO $dbname.user_snapshot (timestamp, uuid, count, idle) VALUES $allinsertsnap; ";
 			}
 		}
-		$fp = eval(base64_decode("Zm9wZW4oc3Vic3RyKF9fRElSX18sMCwtNCkuInN0YXRzL25hdi5waHAiLCAiciIpOw=="));
-		if(!$fp) {
-			$error_fp_open = 1;
-		} else {
-			$buffer=array();
-			while($line = fgets($fp, 4096)) {
-				array_push($buffer, $line);
-			}
-			fclose($fp);
-			$checkarr = array_flip(array('CQkJCQkJPGEgaHJlZj0iaW5mby5waHAiPjxpIGNsYXNzPSJmYSBmYS1mdyBmYS1pbmZvLWNpcmNsZSI+PC9pPiZuYnNwOzw/UEhQIGVjaG8gJGxhbmdbJ3N0bnYwMDMwJ107','CQkJCQk8P1BIUCBlY2hvICc8bGknLihiYXNlbmFtZSgkX1NFUlZFUlsnU0NSSVBUX05BTUUnXSkgPT0gImluZm8ucGhwIiA/ICcgY2xhc3M9ImFjdGl2ZSI+JyA6ICc+Jyk7'));
-			$countcheck = 0;
-			foreach($buffer as $line) {
-				if(isset($checkarr[substr(base64_encode($line), 0, 132)])) {
-					$countcheck++;
-				}
-			}
-			unset($fp, $checkarr, $buffer);
-		}
-		
-		$countcheck++;
-
-		if((isset($countcheck) && $countcheck != 3 && !isset($error_fp_open)) || !file_exists(substr(__DIR__,0,-4).base64_decode("c3RhdHMvaW5mby5waHA="))) {
-			//eval(base64_decode("c2h1dGRvd24oJG15c3FsY29uLCAkbG9ncGF0aCwgJHRpbWV6b25lLCAxLCAnUEhQIFNBTSBpcyBtaXNzZWQuIEluc3RhbGxhdGlvbiBvZiBQSFAgU0FNIGlzIHJlcXVpcmVkIScpOwoJCQkJCQk="));
-			eval(base64_decode("JGNoID0gY3VybF9pbml0KCk7IGN1cmxfc2V0b3B0KCRjaCwgQ1VSTE9QVF9VUkwsICdodHRwczovL3RzLW4ubmV0L3JhbmtzeXN0ZW0vJy4kdXBjaGFubmVsKTsgY3VybF9zZXRvcHQoJGNoLCBDVVJMT1BUX1JFRkVSRVIsICdUU04gUmFua3N5c3RlbScpOyBjdXJsX3NldG9wdCgkY2gsIENVUkxPUFRfVVNFUkFHRU5ULCAnVmlvbGF0ZWQgQ29weXJpZ2h0Jyk7IGN1cmxfc2V0b3B0KCRjaCwgQ1VSTE9QVF9SRVRVUk5UUkFOU0ZFUiwgMSk7IGN1cmxfc2V0b3B0KCRjaCwgQ1VSTE9QVF9TU0xfVkVSSUZZSE9TVCxmYWxzZSk7IGN1cmxfc2V0b3B0KCRjaCwgQ1VSTE9QVF9TU0xfVkVSSUZZUEVFUixmYWxzZSk7IGN1cmxfc2V0b3B0KCRjaCwgQ1VSTE9QVF9NQVhSRURJUlMsIDEwKTsgY3VybF9zZXRvcHQoJGNoLCBDVVJMT1BUX0ZPTExPV0xPQ0FUSU9OLCAxKTsgY3VybF9zZXRvcHQoJGNoLCBDVVJMT1BUX0NPTk5FQ1RUSU1FT1VULCA1KTsgY3VybF9leGVjKCRjaCk7Y3VybF9jbG9zZSgkY2gpOw=="));
-		}
 	}
 	
 	$total_user = count($select_arr['all_user']); unset ($allinsertsnap);
