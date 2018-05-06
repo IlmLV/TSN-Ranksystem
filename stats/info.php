@@ -33,17 +33,7 @@ require_once('nav.php');
 				<div class="row">
 					<div class="col-lg-12">
 						<h4><strong><span class="text-success"><?PHP echo $lang['stri0004']; ?></span></strong></h4>
-						<p>TS3 Ranksystem - <strong>Newcomer1989</strong> Copyright &copy; 2009-2018</p>
-						<br>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-12">
-						<h4><strong><span class="text-warning"><?PHP echo $lang['stri0005']; ?></span></strong></h4>
-						<p><?PHP echo $lang['stri0006']; ?></p>
-						<p><?PHP echo $lang['stri0007']; ?></p>
-						<p><?PHP echo $lang['stri0023']; ?></p>
-						<p><?PHP echo $lang['stri0008']; ?></p>
+						<p>TS3 Ranksystem - Newcomer1989 Copyright &copy; 2009-2018</p>
 						<br>
 					</div>
 				</div>
@@ -65,23 +55,6 @@ require_once('nav.php');
 						<p><a href="//www.virtuosoft.eu/code/bootstrap-touchspin" target="_blank">Bootstrap TouchSpin 3.1.2</a> - Copyright &copy; 2013-2016 István Ujj-Mészáros</p>
 						<p><a href="//developer.snapappointments.com/bootstrap-select" target="_blank">bootstrap-select v1.13.0-beta</a> - Copyright &copy; 2012-2018 SnapAppointments, LLC</p>
 						<p><a href="//wenzhixin.net.cn/" target="_blank">Bootstrap Show Password 1.0.3</a> - Copyright &copy; 2014 zhixin wen</p>
-						<br>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-12">
-						<h4><strong><span class="text-info"><?PHP echo $lang['stri0012']; ?></span></strong></h4>
-						<p><?PHP echo $lang['stri0021']; ?></p>
-						<p><?PHP echo $lang['stri0022']; ?></p>
-						<p><?PHP echo $lang['stri0013']; ?></p>
-						<p><?PHP echo $lang['stri0014']; ?></p>
-						<p><?PHP echo $lang['stri0015']; ?></p>
-						<p><?PHP echo $lang['stri0016']; ?></p>
-						<p><?PHP echo $lang['stri0017']; ?></p>
-						<p><?PHP echo $lang['stri0018']; ?></p>
-						<p><?PHP echo $lang['stri0019']; ?></p>
-						<p><?PHP echo $lang['stri0020']; ?></p>
-						<p><?PHP echo $lang['stri0024']; ?></p>
 						<br>
 					</div>
 				</div>
