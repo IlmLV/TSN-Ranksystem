@@ -33,7 +33,7 @@ require_once('nav.php');
 				<div class="row">
 					<div class="col-lg-12">
 						<h4><strong><span class="text-success"><?PHP echo $lang['stri0004']; ?></span></strong></h4>
-						<p>The <a href="//ts-n.net/ranksystem.php" target="_blank">Ranksystem</a> was coded by <strong>Newcomer1989</strong> Copyright &copy; 2009-2018 <a href="//ts-n.net/" target="_blank">TeamSpeak Sponsoring TS-N.NET</a></p>
+						<p>TS3 Ranksystem - <strong>Newcomer1989</strong> Copyright &copy; 2009-2018</p>
 						<br>
 					</div>
 				</div>
