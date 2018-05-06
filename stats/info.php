@@ -1,4 +1,4 @@
-<?PHP
+﻿<?PHP
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_strict_mode', 1);
 if(in_array('sha512', hash_algos())) {
@@ -44,17 +44,7 @@ require_once('nav.php');
 				<div class="row">
 					<div class="col-lg-12">
 						<h4><strong><span class="text-success"><?PHP echo $lang['stri0004']; ?></span></strong></h4>
-						<p>The <a href="//ts-n.net/ranksystem.php" target="_blank" rel="noopener noreferrer">Ranksystem</a> was coded by <strong>Newcomer1989</strong> Copyright &copy; 2009-2018 <a href="//ts-n.net/" target="_blank" rel="noopener noreferrer">TeamSpeak Sponsoring TS-N.NET</a></p>
-						<br>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-12">
-						<h4><strong><span class="text-warning"><?PHP echo $lang['stri0005']; ?></span></strong></h4>
-						<p><?PHP echo $lang['stri0006']; ?></p>
-						<p><?PHP echo $lang['stri0007']; ?></p>
-						<p><?PHP echo $lang['stri0023']; ?></p>
-						<p><?PHP echo $lang['stri0008']; ?></p>
+						<p>TS3 Ranksystem - Newcomer1989 Copyright &copy; 2009-2018</p>
 						<br>
 					</div>
 				</div>
@@ -79,26 +69,8 @@ require_once('nav.php');
 						<br>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-lg-12">
-						<h4><strong><span class="text-info"><?PHP echo $lang['stri0012']; ?></span></strong></h4>
-						<p><?PHP echo $lang['stri0021']; ?></p>
-						<p><?PHP echo $lang['stri0022']; ?></p>
-						<p><?PHP echo $lang['stri0013']; ?></p>
-						<p><?PHP echo $lang['stri0014']; ?></p>
-						<p><?PHP echo $lang['stri0015']; ?></p>
-						<p><?PHP echo $lang['stri0016']; ?></p>
-						<p><?PHP echo $lang['stri0017']; ?></p>
-						<p><?PHP echo $lang['stri0018']; ?></p>
-						<p><?PHP echo $lang['stri0019']; ?></p>
-						<p><?PHP echo $lang['stri0020']; ?></p>
-						<p><?PHP echo $lang['stri0024']; ?></p>
-						<p><?PHP echo $lang['stri0025']; ?></p>
-						<br>
 					</div>
 				</div>
 			</div>
-		</div>
-	</div>
 </body>
 </html>

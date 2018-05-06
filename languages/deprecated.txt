@@ -1,0 +1,16 @@
+$lang['stri0006'];
+$lang['stri0007'];
+$lang['stri0023'];
+$lang['stri0008'];
+$lang['stri0012'];
+$lang['stri0021'];
+$lang['stri0022'];
+$lang['stri0013'];
+$lang['stri0014'];
+$lang['stri0015'];
+$lang['stri0016'];
+$lang['stri0017'];
+$lang['stri0018'];
+$lang['stri0019'];
+$lang['stri0020'];
+$lang['stri0024'];
