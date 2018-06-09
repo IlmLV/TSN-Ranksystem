@@ -97,10 +97,7 @@ if(isset($currvers) && isset($newversion) && $newversion != NULL && version_comp
 }
 enter_logfile($logpath,$timezone,5,"Check Ranksystem files for updates [done]");
 
-function check_shutdown($timezone,$logpath=false) {
-	if($logpath === false)
-		global $logpath;
-
+function check_shutdown($timezone,$logpath) {
 	if(!is_file(substr(__DIR__,0,-4).'logs/pid')) {
 		shutdown($mysqlcon, $logpath, $timezone, 5, "Received signal to stop!");
 	}
