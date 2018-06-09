@@ -130,8 +130,8 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 					}
 					
 					// Grant new rank if necessary online time has been reached
-					elseif ($activetime > $time && ($keephigherranks === 0 || $time > $grpidTime) && !isset($exceptuuid[$uid]) && !array_intersect_key($sgroups, $exceptgroup)) {
-						if ($grpid != $groupid) {
+					elseif ($activetime > $time && !isset($exceptuuid[$uid]) && !array_intersect_key($sgroups, $exceptgroup)) {
+						if ($grpid != $groupid && ($keephigherranks === 0 || $time > $grpidTime)) {
 							if ($grpid != NULL && isset($sgroups[$grpid])) {
 								usleep($slowmode);
 								try {
@@ -191,6 +191,7 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 						break;
 					} else {
 						$nextup = $time - $activetime;
+						enter_logfile($logpath,$timezone,6,"time: $time, activetime: $activetime, nextup: $nextup");
 					}
 				}
 				
@@ -208,6 +209,8 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 						}
 					}
 				}
+
+				enter_logfile($logpath,$timezone,6,"cldbid: $cldbid, nextup: $nextup");
 				
 				$updatedata[] = array(
 					"uuid" => $mysqlcon->quote($client['client_unique_identifier'], ENT_QUOTES),
