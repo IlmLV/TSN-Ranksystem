@@ -173,7 +173,6 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 						break;
 					} else {
 						$nextup = $time - $activetime;
-						enter_logfile($logpath,$timezone,6,"time: $time, activetime: $activetime, nextup: $nextup");
 					}
 				}
 				
@@ -191,8 +190,6 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 						}
 					}
 				}
-
-				enter_logfile($logpath,$timezone,6,"cldbid: $cldbid, nextup: $nextup");
 				
 				$updatedata[] = array(
 					"uuid" => $mysqlcon->quote($client['client_unique_identifier'], ENT_QUOTES),
