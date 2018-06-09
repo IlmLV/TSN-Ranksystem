@@ -53,6 +53,8 @@ if(isset($_REQUEST['token']) && isset($_SESSION[$rspathhex.'temp_uuid'])) {
 			$_SESSION[$rspathhex.'tsavatar'] = "none";
 		}
 		$_SESSION[$rspathhex.'language']  = $language;
+
+		header('Location: ../stats');
 	} else {
 		$err_msg = $lang['stve0006']; $err_lvl = 3;
 	}
