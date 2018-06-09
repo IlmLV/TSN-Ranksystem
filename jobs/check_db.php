@@ -1,6 +1,6 @@
 <?PHP
 function check_db($mysqlcon,$lang,$dbname,$timezone,$currvers,$logpath) {
-	$newversion = '1.2.6';
+	$newversion = '1.2.7';
 	enter_logfile($logpath,$timezone,5,"Check Ranksystem database for updates...");
 	
 	function set_new_version($mysqlcon,$dbname,$timezone,$newversion,$logpath) {
@@ -221,6 +221,14 @@ function check_db($mysqlcon,$lang,$dbname,$timezone,$currvers,$logpath) {
 			if($mysqlcon->exec("UPDATE $dbname.job_check SET timestamp='".time()."' WHERE job_name='last_update'") === false) { } else {
 				enter_logfile($logpath,$timezone,4,"    [1.2.6] Stored timestamp of last update successfully.");
 			}			
+		}
+		if(version_compare($currvers, '1.2.6', '<=')) {
+			if($mysqlcon->exec("ALTER TABLE $dbname.config ADD COLUMN forceremovelowerranks TINYINT(1) NOT NULL DEFAULT '0'") === false) { } else {
+				enter_logfile($logpath,$timezone,4,"    [1.2.7] Added config table column 'forceremovelowerranks'.");
+			}
+			if($mysqlcon->exec("ALTER TABLE $dbname.config ADD COLUMN keephigherranks TINYINT(1) NOT NULL DEFAULT '0'") === false) { } else {
+				enter_logfile($logpath,$timezone,4,"    [1.2.7] Added config table column 'keephigherranks'.");
+			}
 		}
 		$currvers = set_new_version($mysqlcon,$dbname,$timezone,$newversion,$logpath);
 		old_files($timezone,$logpath);

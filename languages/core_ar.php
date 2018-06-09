@@ -1,4 +1,4 @@
-<?PHP
+﻿<?PHP
 $lang= array();
 $lang['adduser']			= "User %s (unique Client-ID: %s; Client-database-ID %s) is unknown -> added to the Ranksystem now.";
 $lang['brute']				= "Much incorrect logins detected on the webinterface. Blocked login for 300 seconds! Last access from IP %s.";
@@ -408,6 +408,10 @@ $lang['wiexuid']			= "استثناء المستخدم";
 $lang['wiexuiddesc']		= "A comma seperated list of unique Client-IDs, which should not conside for the Ranksystem.<br>User in this list will be ignored for the rank up.";
 $lang['wigrptime']			= "ترفيع رتبة";
 $lang['wigrptimedesc']		= "Define here after which time a user should get automatically a predefined servergroup.<br><br>time (seconds)=>servergroup ID<br><br>Important for this is the 'online time' or the 'active time' of an user, depending on setting of the mode.<br><br>Each entry have to separate from next with a comma.<br><br>The time must be entered cumulative<br><br>Example:<br>60=>9,120=>10,180=>11<br><br>On this a user get after 60 seconds the servergroup 9, in turn after 60 seconds the servergroup 10, and so on...";
+$lang['forceremovelowerranks']	= "Forced removal of lower ranks";
+$lang['forceremovelowerranksdesc']	= "If client has more than one ranksystem group, all, except one higher ranked, will be removed.";
+$lang['keephigherranks']	 = "Keep manually defined ranks";
+$lang['keephigherranksdesc']	= "Keep client rank, when it is higher than it should be by online time.";
 $lang['wihladm']			= "List Rankup (Admin-Mode)";
 $lang['wihladm1']			= "Add online Time to User";
 $lang['wihlcfg']			= "خيارات النواة";

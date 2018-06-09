@@ -167,6 +167,8 @@ if (isset($mysqlcon) && ($config = $mysqlcon->query("SELECT * FROM config")->fet
 		$upchannel		 = $config['upchannel'];
 		$avatar_delay	 = $config['avatar_delay'];
 		$registercid	 = $config['registercid'];
+		$forceremovelowerranks = (int)$config['forceremovelowerranks'];
+		$keephigherranks = (int)$config['keephigherranks'];
 	}
 }
 if(!isset($language) || $language == "en") {
