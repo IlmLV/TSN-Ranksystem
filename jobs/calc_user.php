@@ -1,5 +1,6 @@
 <?PHP
 function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$boostarr,$resetbydbchange,$msgtouser,$currvers,$substridle,$exceptuuid,$exceptgroup,$allclients,$logpath,$rankupmsg,$ignoreidle,$exceptcid,$resetexcept,$phpcommand,$select_arr) {
+	global $forceremovelowerranks, $keephigherranks;
 	$nowtime = time();
 	$sqlexec = '';
 
@@ -22,6 +23,7 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 	$insertdata = array();
 	$updatedata = array();
 	
+	// Loop every online client from team speak server
 	foreach ($allclients as $client) {
 		$cldbid = $client['client_database_id'];
 		$name = $mysqlcon->quote($client['client_nickname'], ENT_QUOTES);
@@ -43,7 +45,7 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 			} elseif(array_intersect_key($sgroups, $exceptgroup)) {
 				$except = 2;
 			} else {
-				if(isset($select_arr['all_user'][$uid]['except']) && ($select_arr['all_user'][$uid]['except'] == 3 || $select_arr['all_user'][$uid]['except'] == 2) && $resetexcept == 2) { 
+				if(isset($select_arr['all_user'][$uid]['except']) && ($select_arr['all_user'][$uid]['except'] == 3 || $select_arr['all_user'][$uid]['except'] == 2) && $resetexcept == 2) {
 				 	$select_arr['all_user'][$uid]['count'] = 0;
 				 	$select_arr['all_user'][$uid]['idle'] = 0;
 					enter_logfile($logpath,$timezone,5,sprintf($lang['resettime'], $name, $uid, $cldbid));
@@ -51,9 +53,10 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 				}
 				$except = 0;
 			}
+			
+			// Check if client exists in rank database
 			if(isset($select_arr['all_user'][$uid])) {
 				$idle   = $select_arr['all_user'][$uid]['idle'] + $clientidle;
-				$grpid  = $select_arr['all_user'][$uid]['grpid'];
 				$nextup = $select_arr['all_user'][$uid]['nextup'];
 				$grpsince = $select_arr['all_user'][$uid]['grpsince'];
 				if ($select_arr['all_user'][$uid]['cldbid'] != $cldbid && $resetbydbchange == 1) {
@@ -103,12 +106,18 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 					$activetime = $count;
 				}
 				$dtT = new DateTime("@$activetime");
+				
+				// Get client acquired top ranked group and this group required online time
+				$grpid = $grpidTime = NULL;
 				foreach ($grouptime as $time => $groupid) {
 					if (isset($sgroups[$groupid])) {
 						$grpid = $groupid;
+						$grpidTime = $time;
 						break;
 					}
 				}
+				
+				// Add new client server groups
 				$grpcount=0;
 				foreach ($grouptime as $time => $groupid) {
 					$grpcount++;
@@ -118,13 +127,16 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 						if($except != 2 && $except != 3) {
 							$except = 1;
 						}
-					} elseif ($activetime > $time && !isset($exceptuuid[$uid]) && !array_intersect_key($sgroups, $exceptgroup)) {
-						if ($select_arr['all_user'][$uid]['grpid'] != $groupid) {
-							if ($select_arr['all_user'][$uid]['grpid'] != NULL && isset($sgroups[$select_arr['all_user'][$uid]['grpid']])) {
+					}
+					
+					// Grant new rank if necessary online time has been reached
+					elseif ($activetime > $time && ($keephigherranks === 0 || $time > $grpidTime) && !isset($exceptuuid[$uid]) && !array_intersect_key($sgroups, $exceptgroup)) {
+						if ($grpid != $groupid) {
+							if ($grpid != NULL && isset($sgroups[$grpid])) {
 								usleep($slowmode);
 								try {
-									$ts3->serverGroupClientDel($select_arr['all_user'][$uid]['grpid'], $cldbid);
-									enter_logfile($logpath,$timezone,5,sprintf($lang['sgrprm'], $select_arr['groups'][$select_arr['all_user'][$uid]['grpid']]['sgidname'], $select_arr['all_user'][$uid]['grpid'], $name, $uid, $cldbid));
+									$ts3->serverGroupClientDel($grpid, $cldbid);
+									enter_logfile($logpath,$timezone,5,sprintf($lang['sgrprm'], $select_arr['groups'][$grpid]['sgidname'], $grpid, $name, $uid, $cldbid));
 								}
 								catch (Exception $e) {
 									enter_logfile($logpath,$timezone,2,"TS3 error: ".$e->getCode().': '.$e->getMessage()." ; ".sprintf($lang['sgrprerr'], $name, $uid, $cldbid, $select_arr['groups'][$groupid]['sgidname'], $groupid));
@@ -181,6 +193,22 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 						$nextup = $time - $activetime;
 					}
 				}
+				
+				// Remove all server groups ranked lower than client top rank (prevents multiple ranks per client)
+				if ($forceremovelowerranks === 1) {
+					foreach ($grouptime as $time => $groupid) {
+						if ($grpid != $groupid && $time < $grpidTime && $groupid != 0 && isset($sgroups[$groupid])) {
+							usleep($slowmode);
+							try {
+								$ts3->serverGroupClientDel($groupid, $cldbid);
+								enter_logfile($logpath, $timezone, 5, sprintf($lang['sgrprm'], $select_arr['groups'][$groupid]['sgidname'], $groupid, $name, $uid, $cldbid));
+							} catch (Exception $e) {
+								enter_logfile($logpath, $timezone, 2, "TS3 error: " . $e->getCode() . ': ' . $e->getMessage() . " ; " . sprintf($lang['sgrprerr'], $name, $uid, $cldbid, $select_arr['groups'][$groupid]['sgidname'], $groupid));
+							}
+						}
+					}
+				}
+				
 				$updatedata[] = array(
 					"uuid" => $mysqlcon->quote($client['client_unique_identifier'], ENT_QUOTES),
 					"cldbid" => $cldbid,
@@ -200,7 +228,10 @@ function calc_user($ts3,$mysqlcon,$lang,$dbname,$slowmode,$timezone,$grouptime,$
 					"grpsince" => $grpsince,
 					"cid" => $client['cid']
 				);
-			} else {
+			}
+			
+			// Client does not exist in ranksystem db, create new
+			else {
 				$grpid = '0';
 				foreach ($grouptime as $time => $groupid) {
 					if (isset($sgroups[$groupid])) {
