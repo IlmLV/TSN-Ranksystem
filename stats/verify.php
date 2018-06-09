@@ -89,7 +89,7 @@ if((!isset($_SESSION[$rspathhex.'multiple']) || count($_SESSION[$rspathhex.'mult
 	$err_msg = $lang['stve0005']; $err_lvl = 1;
 }
 
-if(isset($_POST['uuid']) && !isset($_SESSION[$rspathhex.'temp_uuid'])) {
+if(isset($_POST['uuid']) && (!isset($_SESSION[$rspathhex.'temp_uuid']) || $_SESSION[$rspathhex.'temp_uuid'] != $_POST['uuid'])) {
 	require_once('../libs/ts3_lib/TeamSpeak3.php');
 	try {
 		if($ts['tsencrypt'] == 1) {
