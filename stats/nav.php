@@ -14,8 +14,8 @@ if((time() - $job_check['last_update']['timestamp']) < 259200 && !isset($_SESSIO
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="version" content="<?PHP echo $currvers; ?>">
-	<link rel="icon" href="../tsicons/rs.png">
-	<title>TS-N.NET Ranksystem</title>
+    <link rel="icon" href="../tsicons/favicon.png">
+	<title>TS3 Ranksystem</title>
 	<link href="../libs/combined_st.css?v=<?PHP echo $currvers; ?>" rel="stylesheet">
 <?PHP
 	$sitescript = basename($_SERVER['SCRIPT_NAME']);
