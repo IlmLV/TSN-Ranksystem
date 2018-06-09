@@ -89,7 +89,7 @@ if($_SESSION[$rspathhex.'multiple'] == NULL && count($multi_uuid) < 2 && ($regis
 	$err_msg = $lang['stve0006']; $err_lvl = 3;
 }
 
-if(isset($_POST['uuid']) && !isset($_SESSION[$rspathhex.'temp_uuid'])) {
+if(isset($_POST['uuid']) && (!isset($_SESSION[$rspathhex.'temp_uuid']) || $_SESSION[$rspathhex.'temp_uuid'] != $_POST['uuid'])) {
 	require_once('../libs/ts3_lib/TeamSpeak3.php');
 	try {
 		$ts3 = TeamSpeak3::factory("serverquery://".$ts['user'].":".$ts['pass']."@".$ts['host'].":".$ts['query']."/?server_port=".$ts['voice']."&blocking=0");
