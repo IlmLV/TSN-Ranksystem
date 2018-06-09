@@ -1,18 +1,11 @@
 <?PHP
-function get_avatars($ts3,$mysqlcon,$lang,$dbname,$slowmode,$jobid,$timezone,$logpath) {
-	$starttime = microtime(true);
-	$sqlmsg = '';
-	$sqlerr = 0;
-	$count = 0;
-
+function get_avatars($ts3,$slowmode,$timezone,$logpath,$avatar_delay) {
 	try {
-		check_shutdown($timezone); usleep($slowmode);
+		usleep($slowmode);
 		$tsfilelist = $ts3->channelFileList($cid="0", $cpw="", $path="/");
 	} catch (Exception $e) {
 		if ($e->getCode() != 1281) {
 			enter_logfile($logpath,$timezone,2,"get_avatars 1:".$e->getCode().': '."Error while getting avatarlist: ".$e->getMessage());
-			$sqlmsg .= $e->getCode() . ': ' . "Error while getting avatarlist: " . $e->getMessage();
-			$sqlerr++;
 		}
 	}
 	$fsfilelist = opendir(substr(__DIR__,0,-4).'avatars/');
@@ -21,15 +14,16 @@ function get_avatars($ts3,$mysqlcon,$lang,$dbname,$slowmode,$jobid,$timezone,$lo
 			$fsfilelistarray[$fsfile] = filemtime(substr(__DIR__,0,-4).'avatars/'.$fsfile);
 		}
     }
+	unset($fsfilelist);
 
 	if (isset($tsfilelist)) {
 		foreach($tsfilelist as $tsfile) {
 			$fullfilename = '/'.$tsfile['name'];
 			$uuidasbase16 = substr($tsfile['name'],7);
-			if (!isset($fsfilelistarray[$uuidasbase16.'.png']) || $tsfile['datetime']>$fsfilelistarray[$uuidasbase16.'.png']) {
+			if (!isset($fsfilelistarray[$uuidasbase16.'.png']) || ($tsfile['datetime'] - $avatar_delay) > $fsfilelistarray[$uuidasbase16.'.png']) {
 				if (substr($tsfile['name'],0,7) == 'avatar_') {
 					try {
-						check_shutdown($timezone); usleep($slowmode);
+						check_shutdown($timezone,$logpath); usleep($slowmode);
 						$avatar = $ts3->transferInitDownload($clientftfid="5",$cid="0",$name=$fullfilename,$cpw="", $seekpos=0);
 						$transfer = TeamSpeak3::factory("filetransfer://" . $avatar["host"] . ":" . $avatar["port"]);
 						$tsfile = $transfer->download($avatar["ftkey"], $avatar["size"]);
@@ -38,29 +32,14 @@ function get_avatars($ts3,$mysqlcon,$lang,$dbname,$slowmode,$jobid,$timezone,$lo
 						if(file_put_contents($avatarfilepath, $tsfile) === false) {
 							enter_logfile($logpath,$timezone,2,"Error while writing out the avatar. Please check the permission for the folder 'avatars'");
 						}
-						$count++;
 					}
 					catch (Exception $e) {
 						enter_logfile($logpath,$timezone,2,"get_avatars 2:".$e->getCode().': '."Error while downloading avatar: ".$e->getMessage());
-						$sqlmsg .= $e->getCode() . ': ' . "Error while downloading avatar: " . $e->getMessage();
-						$sqlerr++;
 					}
 				}
 			}
 		}
-	}
-	
-	$buildtime = microtime(true) - $starttime;
-	if ($buildtime < 0) { $buildtime = 0; }
-
-	if ($sqlerr == 0) {
-		if($mysqlcon->exec("UPDATE $dbname.job_log SET status='0', runtime='$buildtime' WHERE id='$jobid'") === false) {
-			enter_logfile($logpath,$timezone,2,"get_avatars 3:".print_r($mysqlcon->errorInfo()));
-		}
-	} else {
-		if($mysqlcon->exec("UPDATE $dbname.job_log SET status='1', err_msg='$sqlmsg', runtime='$buildtime' WHERE id='$jobid'") === false) {
-			enter_logfile($logpath,$timezone,2,"get_avatars 4:".print_r($mysqlcon->errorInfo()));
-		}
+		unset($fsfilelistarray);
 	}
 }
 ?>
