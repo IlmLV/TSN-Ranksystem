@@ -1,39 +1,30 @@
+<?PHP
+$job_check = $mysqlcon->query("SELECT * FROM $dbname.job_check")->fetchAll(PDO::FETCH_UNIQUE|PDO::FETCH_ASSOC);
+if((time() - $job_check['last_update']['timestamp']) < 259200 && !isset($_SESSION[$rspathhex.'upinfomsg'])) {
+	if(!isset($err_msg)) {
+		$err_msg = '<i class="fa fa-fw fa-info-circle"></i>&nbsp;'.sprintf($lang['upinf2'], date("Y-m-d H:i",$job_check['last_update']['timestamp']), '<a href="//ts-n.net/ranksystem.php?changelog" target="_blank"><i class="fa fa-fw fa-book"></i>&nbsp;', '</a>'); $err_lvl = 1;
+		$_SESSION[$rspathhex.'upinfomsg'] = 1;
+	}
+}
+?>
 <!DOCTYPE html>
-<html>
+<html lang="<?PHP echo $language; ?>">
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="version" content="<?PHP echo $currvers; ?>">
-	<link rel="icon" href="../icons/rs.png">
-
+	<link rel="icon" href="../tsicons/rs.png">
 	<title>TS-N.NET Ranksystem</title>
-
-	<!-- Bootstrap Core CSS -->
-	<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-	<!-- Custom CSS -->
-	<link href="../bootstrap/addons/sb-admin.css" rel="stylesheet">
-
-	<!-- Morris Charts CSS -->
-	<link href="../bootstrap/addons/morris/morris.css" rel="stylesheet">
-
-	<!-- Custom Fonts -->
-	<link href="../bootstrap/addons/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-	
-	<!-- Flag icon css -->
-	<link href="../bootstrap/flag_icon/css/flag-icon.min.css" rel="stylesheet">
-
-	<!-- jQuery -->
-	<script src="../jquerylib/jquery.js"></script>
-
-	<!-- Bootstrap Core JavaScript -->
-	<script src="../bootstrap/js/bootstrap.min.js"></script>
-
-	<!-- Morris Charts JavaScript -->
-	<script src="../bootstrap/addons/morris/raphael.min.js"></script>
-	<script src="../bootstrap/addons/morris/morris.min.js"></script>
-	<script src="../bootstrap/addons/morris/morris-data.js"></script>
+	<link href="../libs/combined_st.css?v=<?PHP echo $currvers; ?>" rel="stylesheet">
+	<script src="../libs/combined_st.js?v=<?PHP echo $currvers; ?>"></script>
+<?PHP
+	if(isset($shownav) && $shownav == 0) { ?>
+	<style>
+		body{margin-top:0px!important}
+		.affix{top:0px!important;width:calc(100% - 50px)!important;position:fixed;color:#000;background-color:#fff!important;}
+	</style>
+<?PHP } ?>
 </head>
 <body>
 	<div id="myModal" class="modal fade">
@@ -44,7 +35,7 @@
 					<h4 class="modal-title"><?PHP echo $lang['stnv0001']; ?></h4>
 				</div>
 				<div class="modal-body">
-					<p><?PHP include('../server-news'); ?></p>
+					<p><?PHP echo $servernews; ?></p>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal"><?PHP echo $lang['stnv0002']; ?></button>
@@ -72,7 +63,7 @@
 			</div>
 		</div>
 	</div>
-	<div id="myModal3" class="modal fade">
+	<div id="battlesystem" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -132,18 +123,59 @@
 			</div>
 		</div>
 	</div>
-
+	<div id="filteroptions" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">Filter options - Search function</h4>
+				</div>
+				<div class="modal-body">
+					<p><?PHP echo $lang['stnv0031']; ?></p>
+					<p><?PHP echo $lang['stnv0032']; ?></p>
+					<p><?PHP echo $lang['stnv0033']; ?></p>
+					<p><?PHP echo $lang['stnv0034']; ?></p>
+					<p><?PHP echo $lang['stnv0035']; ?></p>
+					<p><br></p>
+					<p><b>filter:excepted:</b></p>
+					<p><?PHP echo $lang['stnv0036']; ?></p>
+					<p><b>filter:nonexcepted:</b></p>
+					<p><?PHP echo $lang['stnv0037']; ?></p>
+					<p><b>filter:online:</b></p>
+					<p><?PHP echo $lang['stnv0038']; ?></p>
+					<p><b>filter:nononline:</b></p>
+					<p><?PHP echo $lang['stnv0039']; ?></p>
+					<p><b>filter:actualgroup:<i>GROUPID</i>:</b></p>
+					<p><?PHP echo $lang['stnv0040']; ?></p>
+					<p><b>filter:country:<i>TS3-COUNTRY-CODE</i>:</b></p>
+					<p><?PHP echo $lang['stnv0042']; ?></p>
+					<p><b>filter:lastseen:<i>OPERATOR</i>:<i>TIME</i>:</b></p>
+					<p><?PHP echo $lang['stnv0041']; ?></p>
+					<br>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal"><?PHP echo $lang['stnv0002']; ?></button>
+				</div>
+			</div>
+		</div>
+	</div>
+<?PHP
+	if($shownav == 1) {
+?>
 	<div id="wrapper">
-		
-		<!-- Navigation -->
 		<nav class="navbar navbar-inverse navbar-fixed-top">
-			<!-- Brand and toggle get grouped for better mobile display -->
 			<div class="navbar-header">
 				<a class="navbar-brand" href="index.php"><?PHP echo $lang['stnv0024']; ?></a>
 			</div>
-			<!-- Top Menu Items -->
 			<?PHP if(basename($_SERVER['SCRIPT_NAME']) == "list_rankup.php") { ?>
 			<ul class="nav navbar-left top-nav">
+				<li class="navbar-form navbar-left dropdown">
+					<div class="btn-group">
+						<a href="#filteroptions" data-toggle="modal" class="btn btn-primary">
+							<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+						</a>
+					</div>
+				</li>
 				<li class="navbar-form navbar-right dropdown">
 					<button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 						<?PHP echo $lang['stnv0025']; ?>
@@ -170,17 +202,40 @@
 			<?PHP } ?>
 			<ul class="nav navbar-right top-nav">
 				<?PHP
-				$lastscan = $mysqlcon->query("SELECT * FROM $dbname.job_check WHERE job_name='calc_user_lastscan'");
-				$lastscan = $lastscan->fetchAll();
-				if((time() - $lastscan[0]['timestamp']) > 600) { ?>
+				if((time() - $job_check['calc_user_lastscan']['timestamp']) > 600) { ?>
 				<li class="navbar-form navbar-left">
 					<span class="label label-warning"><?PHP echo $lang['stnv0027']; ?></span>
 				</li>
 				<?PHP } ?>
 				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i><?PHP echo '&nbsp;&nbsp;' .($_SESSION['connected'] == 0 ? $lang['stnv0028'] : $_SESSION['tsname']); ?>&nbsp;<b class="caret"></b></a>
-					<ul class="dropdown-menu">
-						<?PHP echo (!isset($_SESSION['tsname']) ? ' ' : '<li><a href="my_stats.php"><i class="fa fa-fw fa-user"></i>&nbsp;'.$lang['stmy0001'].'</a></li>'); ?>
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i><?PHP echo '&nbsp;&nbsp;' . $_SESSION[$rspathhex.'tsname'] ?>&nbsp;
+					<b class="caret"></b></a><ul class="dropdown-menu">
+						<?PHP
+						if($_SESSION[$rspathhex.'tsname'] == "verification needed!" || $_SESSION[$rspathhex.'connected'] == 0) {
+							echo '<li><a href="verify.php"><i class="fa fa-fw fa-key"></i>&nbsp;verificate here..</a></li>';
+						}
+						if(isset($_SESSION[$rspathhex.'admin']) && $_SESSION[$rspathhex.'admin'] == TRUE) {
+							if($_SERVER['SERVER_PORT'] == 443 || $_SERVER['SERVER_PORT'] == 80) {
+								echo '<li><a href="//',$_SERVER['SERVER_NAME'],':',substr(dirname($_SERVER['SCRIPT_NAME']),0,-5),'webinterface/bot.php"><i class="fa fa-fw fa-wrench"></i>&nbsp;',$lang['wi'],'</a></li>';
+							} else {
+								echo '<li><a href="//',$_SERVER['SERVER_NAME'],':',$_SERVER['SERVER_PORT'],substr(dirname($_SERVER['SCRIPT_NAME']),0,-5),'webinterface/bot.php"><i class="fa fa-fw fa-wrench"></i>&nbsp;',$lang['wi'],'</a></li>';
+							}
+						} elseif ($_SESSION[$rspathhex.'connected'] == 0) {
+							echo '<li><a href="ts3server://';
+								if (($ts['host']=='localhost' || $ts['host']=='127.0.0.1') && strpos($_SERVER['HTTP_HOST'], 'www.') == 0) {
+									echo preg_replace('/www\./','',$_SERVER['HTTP_HOST']);
+								} elseif ($ts['host']=='localhost' || $ts['host']=='127.0.0.1') {
+									echo $_SERVER['HTTP_HOST'];
+								} else {
+									echo $ts['host'];
+								}
+								echo ':'.$ts['voice'];
+							echo '"><i class="fa fa-fw fa-headphones"></i>&nbsp;'.$lang['stnv0043'].'</a></li>';
+						}
+						?>
+						<li>
+							<a href="my_stats.php"><i class="fa fa-fw fa-user"></i>&nbsp;<?PHP echo $lang['stmy0001']; ?></a>
+						</li>
 						<li>
 							<a href="#myModal" data-toggle="modal"><i class="fa fa-fw fa-envelope"></i>&nbsp;<?PHP echo $lang['stnv0001']; ?></a>
 						</li>
@@ -199,32 +254,50 @@
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-globe"></i>&nbsp;<b class="caret"></b></a>
 					<ul class="dropdown-menu">
 						<li>
-							<a href="?lang=de" data-toggle="modal"><span class="flag-icon flag-icon-de"></span>&nbsp;&nbsp;<?PHP echo $lang['stnv0031']; ?></a>
+							<a href="?lang=ar"><span class="flag-icon flag-icon-arab"></span>&nbsp;&nbsp;AR - العربية</a>
 						</li>
 						<li>
-							<a href="?lang=en" data-toggle="modal"><span class="flag-icon flag-icon-us"></span>&nbsp;&nbsp;<?PHP echo $lang['stnv0032']; ?></a>
+							<a href="?lang=cz"><span class="flag-icon flag-icon-cz"></span>&nbsp;&nbsp;CZ - čeština</a>
 						</li>
 						<li>
-							<a href="?lang=it" data-toggle="modal"><span class="flag-icon flag-icon-it"></span>&nbsp;&nbsp;<?PHP echo $lang['stnv0034']; ?></a>
+							<a href="?lang=de"><span class="flag-icon flag-icon-de"></span>&nbsp;&nbsp;DE - Deutsch</a>
 						</li>
 						<li>
-							<a href="?lang=ru" data-toggle="modal"><span class="flag-icon flag-icon-ru"></span>&nbsp;&nbsp;<?PHP echo $lang['stnv0033']; ?></a>
+							<a href="?lang=en"><span class="flag-icon flag-icon-gb"></span>&nbsp;&nbsp;EN - english</a>
+						</li>
+						<li>
+							<a href="?lang=fr"><span class="flag-icon flag-icon-fr"></span>&nbsp;&nbsp;FR - français</a>
+						</li>
+						<li>
+							<a href="?lang=it"><span class="flag-icon flag-icon-it"></span>&nbsp;&nbsp;IT - Italiano</a>
+						</li>
+						<li>
+							<a href="?lang=nl"><span class="flag-icon flag-icon-nl"></span>&nbsp;&nbsp;NL - Nederlands</a>
+						</li>
+						<li>
+							<a href="?lang=ro"><span class="flag-icon flag-icon-ro"></span>&nbsp;&nbsp;RO - Română</a>
+						</li>
+						<li>
+							<a href="?lang=ru"><span class="flag-icon flag-icon-ru"></span>&nbsp;&nbsp;RU - Pусский</a>
+						</li>
+						<li>
+							<a href="?lang=pt"><span class="flag-icon flag-icon-ptbr"></span>&nbsp;&nbsp;PT - Português</a>
 						</li>
 					</ul>
 				</li>
 			</ul>
-			<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
 			<div class="collapse navbar-collapse navbar-ex1-collapse">
 				<ul class="nav navbar-nav side-nav">
 					<?PHP echo '<li'.(basename($_SERVER['SCRIPT_NAME']) == "index.php" ? ' class="active">' : '>'); ?>
 						<a href="index.php"><i class="fa fa-fw fa-area-chart"></i>&nbsp;<?PHP echo $lang['stix0001']; ?></a>
 					</li>
 					<?PHP echo '<li'.(basename($_SERVER['SCRIPT_NAME']) == "my_stats.php" ? ' class="active">' : '>'); ?>
-						<?PHP if($_SESSION['connected'] == 0) {
-							echo '<a href="#myStatsModal" data-toggle="modal"><i class="fa fa-fw fa-exclamation-triangle"></i>&nbsp;*',$lang['stmy0001'],'</a>';
-						} else {
-							echo '<a href="my_stats.php"><i class="fa fa-fw fa-bar-chart-o"></i>&nbsp;',$lang['stmy0001'],'</a>';
-						}?>
+						<a href="my_stats.php"><i class="fa fa-fw fa-bar-chart-o"></i>&nbsp;<?PHP echo $lang['stmy0001']; ?></a>
+					</li>
+					<?PHP if($addons_config['assign_groups_active']['value'] == '1') {
+							echo '<li'.(basename($_SERVER['SCRIPT_NAME']) == "assign_groups.php" ? ' class="active">' : '>'); ?>
+							<a href="assign_groups.php"><i class="fa fa-fw fa-address-card-o"></i>&nbsp;<?PHP echo $lang['stag0001']; ?></a>
+						<?PHP }	?>
 					</li>
 					<?PHP echo '<li'.(basename($_SERVER['SCRIPT_NAME']) == "top_all.php" ? ' class="active">' : '>'); ?>
 						<a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-trophy"></i>&nbsp;<?PHP echo $lang['sttw0001']; ?>&nbsp;<i class="fa fa-fw fa-caret-down"></i></a>
@@ -248,9 +321,13 @@
 					</li>
 				</ul>
 			</div>
-			<!-- /.navbar-collapse -->
 		</nav>
 <?PHP
+	} else {
+		echo '<div id="container">';
+	}
+
+
 function error_handling($msg,$type = NULL) {
 	switch ($type) {
 		case NULL: echo '<div class="alert alert-success alert-dismissible">'; break;
